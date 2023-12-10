@@ -1,11 +1,13 @@
+import 'package:flutter/foundation.dart';
+
 import 'stage_state.dart';
 
-class PushGame {
+class Sokoban {
   late int _stage;
   late int step;
   late StageState state;
 
-  PushGame({int stage = 1, this.step = 0}) {
+  Sokoban({int stage = 1, this.step = 0}) {
     _stage = stage;
     state = StageState(stage: stage);
   }
@@ -23,7 +25,9 @@ class PushGame {
     changeState(input);
     draw();
     if (state.isClear) {
-      print("Congratulation's! you won.");
+      if (kDebugMode) {
+        print("Congratulation's! you won.");
+      }
     }
   }
 

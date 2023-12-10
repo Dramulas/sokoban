@@ -3,20 +3,20 @@ import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:sokoban/src/push_game.dart';
 
 import 'components/player.dart';
 import 'components/crate.dart';
 
 import 'dart:async';
 
-import 'src/push_game.dart';
 import 'utility/config.dart';
 import 'utility/direction.dart';
 
 class MainGame extends FlameGame with KeyboardEvents, HasGameRef {
   late Function stateCallbackHandler;
 
-  PushGame pushGame = PushGame();
+  Sokoban sokoban = Sokoban();
   late Player _player;
   final List<Crate> _crateList = [];
   final List<SpriteComponent> _bgComponentList = [];
@@ -45,8 +45,8 @@ class MainGame extends FlameGame with KeyboardEvents, HasGameRef {
   void setCallback(Function fn) => stateCallbackHandler = fn;
 
   Future<void> draw() async {
-    for (var y = 0; y < pushGame.state.splitStageStateList.length; y++) {
-      final row = pushGame.state.splitStageStateList[y];
+    for (var y = 0; y < sokoban.state.splitStageStateList.length; y++) {
+      final row = sokoban.state.splitStageStateList[y];
       final firstWallIndex = row.indexOf('#');
       final lastWallIndex = row.lastIndexOf('#');
 
@@ -66,10 +66,10 @@ class MainGame extends FlameGame with KeyboardEvents, HasGameRef {
       add(crate);
     }
 
-    if (pushGame.state.width > playerCameraWallWidth) {
+    if (sokoban.state.width > playerCameraWallWidth) {
       camera.follow(_player);
     } else {
-      // camera.followVector2(Vector2(pushGame.state.width * oneBlockSize / 2, pushGame.state.height * oneBlockSize / 2));
+      // camera.followVector2(Vector2(sokoban.state.width * oneBlockSize / 2, sokoban.state.height * oneBlockSize / 2));
       // final component = _bgComponentList.first;
       // camera.followComponent(component);
       // camera.setRelativeOffset(Anchor.center);
@@ -130,19 +130,19 @@ class MainGame extends FlameGame with KeyboardEvents, HasGameRef {
     final isKeyDown = event is RawKeyDownEvent;
     Direction keyDirection = Direction.none;
 
-    if (!isKeyDown || _player.moveCount != 0 || pushGame.state.isClear) {
+    if (!isKeyDown || _player.moveCount != 0 || sokoban.state.isClear) {
       return super.onKeyEvent(event, keysPressed);
     }
 
     keyDirection = getKeyDirection(event);
-    bool isMove = pushGame.changeState(keyDirection.name);
+    bool isMove = sokoban.changeState(keyDirection.name);
     if (isMove) {
       playerMove(isKeyDown, keyDirection);
-      if (pushGame.state.isCrateMove) {
+      if (sokoban.state.isCrateMove) {
         createMove();
       }
-      if (pushGame.state.isClear) {
-        stateCallbackHandler(pushGame.state.isClear);
+      if (sokoban.state.isClear) {
+        stateCallbackHandler(sokoban.state.isClear);
         Timer(const Duration(seconds: 3), drawNextStage);
       }
     }
@@ -178,14 +178,14 @@ class MainGame extends FlameGame with KeyboardEvents, HasGameRef {
 
   void createMove() {
     final targetCrate = _crateList.firstWhere(
-        (crate) => crate.coordinate == pushGame.state.crateMoveBeforeVec);
-    targetCrate.move(pushGame.state.crateMoveAfterVec);
-    targetCrate.goalCheck(pushGame.state.goalVecList);
+        (crate) => crate.coordinate == sokoban.state.crateMoveBeforeVec);
+    targetCrate.move(sokoban.state.crateMoveAfterVec);
+    targetCrate.goalCheck(sokoban.state.goalVecList);
   }
 
   void drawNextStage() {
-    pushGame.nextStage();
-    stateCallbackHandler(pushGame.state.isClear);
+    sokoban.nextStage();
+    stateCallbackHandler(sokoban.state.isClear);
     allReset();
     draw();
   }

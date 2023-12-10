@@ -2,7 +2,7 @@ import 'package:dart_console/dart_console.dart';
 
 void main(List<String> arguments) async {
   final console = Console();
-  // final game = PushGame();
+  // final game = Sokoban();
   // game.draw();
   console.write('Press the key. To exit, press "q". \n');
 
