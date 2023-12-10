@@ -1,2 +1,2 @@
 Sokoban game
-Developed with Flutter Fire
+Developed with Flutter Flame
