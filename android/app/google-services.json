@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "863759542564",
+    "project_id": "osigo-8db93",
+    "storage_bucket": "osigo-8db93.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:863759542564:android:2a2de5544764b4a617abb1",
+        "android_client_info": {
+          "package_name": "com.polaris.osigo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmfJxzb0HVNU95nudN6LB3swwTtalKn1s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
