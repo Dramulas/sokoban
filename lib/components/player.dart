@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
+import 'package:sokoban/components/feature_manager.dart';
 
 import '../utility/config.dart';
 import '../utility/direction.dart';
@@ -16,8 +17,9 @@ class Player extends SpriteAnimationComponent with HasGameRef {
   late final SpriteAnimation _standingAnimation;
 
   Direction direction = Direction.none;
+  FeatureManager featureManager;
 
-  Player()
+  Player(this.featureManager)
       : super(
           size: Vector2.all(oneBlockSize),
         );
@@ -91,5 +93,18 @@ class Player extends SpriteAnimationComponent with HasGameRef {
   void moveFunc(Vector2 vac) {
     _moveCount -= _moveCoordinate.toInt();
     position.add(vac);
+  }
+
+  void move(Direction direction) {
+    featureManager.movementStrategy.move(this, direction);
+     void moveFunc(int rowIndex) {
+      _moveCount -= _moveCoordinate.toInt();
+      position = Vector2(position.x, rowIndex * _moveCoordinate);
+    }
+  }
+
+  void punch(Direction direction) {
+    featureManager.punchStrategy.punch(this, direction);
+   
   }
 }

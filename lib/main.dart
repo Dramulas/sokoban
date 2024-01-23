@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'main_game_page.dart';
+import 'package:sokoban/home_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,10 +11,10 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'PushPuzzle',
-      home: MainGamePage(),
+      title: 'Sokoban',
+      home: HomePage(),
     );
   }
 }

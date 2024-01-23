@@ -1,8 +1,12 @@
+import 'dart:math';
+
 import 'package:flame/components.dart' hide Timer;
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:sokoban/components/feature_manager.dart';
+import 'package:sokoban/components/user_settings.dart';
 import 'package:sokoban/src/push_game.dart';
 
 import 'components/player.dart';
@@ -15,6 +19,7 @@ import 'utility/direction.dart';
 
 class MainGame extends FlameGame with KeyboardEvents, HasGameRef {
   late Function stateCallbackHandler;
+  FeatureManager featureManager = FeatureManager();
 
   Sokoban sokoban = Sokoban();
   late Player _player;
@@ -23,6 +28,10 @@ class MainGame extends FlameGame with KeyboardEvents, HasGameRef {
   final List<SpriteComponent> _floorSpriteList = [];
   late Map<String, Sprite> _spriteMap;
   late Sprite _floorSprite;
+  int moveCount = 0;
+  bool skillAvailable = false;
+  Random random = Random();
+  late SpriteComponent skillComponent;
 
   @override
   Color backgroundColor() => const Color.fromRGBO(89, 106, 108, 1.0);
@@ -97,7 +106,7 @@ class MainGame extends FlameGame with KeyboardEvents, HasGameRef {
   }
 
   void initPlayer(double x, double y) {
-    _player = Player();
+    _player = Player(featureManager);
     _player.position = Vector2(x * oneBlockSize, y * oneBlockSize);
   }
 
@@ -137,6 +146,13 @@ class MainGame extends FlameGame with KeyboardEvents, HasGameRef {
     keyDirection = getKeyDirection(event);
     bool isMove = sokoban.changeState(keyDirection.name);
     if (isMove) {
+      moveCount++;
+
+      if (moveCount % 5 == 0) {
+        moveCount = 0;
+        generateSkill();
+      }
+
       playerMove(isKeyDown, keyDirection);
       if (sokoban.state.isCrateMove) {
         createMove();
@@ -149,25 +165,55 @@ class MainGame extends FlameGame with KeyboardEvents, HasGameRef {
     return super.onKeyEvent(event, keysPressed);
   }
 
+  Future<void> generateSkill() async {
+    final skill = await Sprite.load('skill.png');
+    final component = skillComponent = SpriteComponent(
+      size: Vector2.all(oneBlockSize),
+      sprite: skill,
+      position: Vector2(oneBlockSize * 1, oneBlockSize * 2),
+    );
+    skillAvailable = true;
+    add(component);
+  }
+
   Direction getKeyDirection(RawKeyEvent event) {
     Direction keyDirection = Direction.none;
-    if (event.logicalKey == LogicalKeyboardKey.keyA ||
-        event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-      keyDirection = Direction.left;
-    } else if (event.logicalKey == LogicalKeyboardKey.keyD ||
-        event.logicalKey == LogicalKeyboardKey.arrowRight) {
-      keyDirection = Direction.right;
-    } else if (event.logicalKey == LogicalKeyboardKey.keyW ||
-        event.logicalKey == LogicalKeyboardKey.arrowUp) {
-      keyDirection = Direction.up;
-    } else if (event.logicalKey == LogicalKeyboardKey.keyS ||
-        event.logicalKey == LogicalKeyboardKey.arrowDown) {
-      keyDirection = Direction.down;
+    var userSettings = UserSettings();
+
+    if (userSettings.controlScheme == ControlScheme.wasd) {
+      // WASD kontrolleri
+      if (event.logicalKey == LogicalKeyboardKey.keyA) {
+        keyDirection = Direction.left;
+      } else if (event.logicalKey == LogicalKeyboardKey.keyD) {
+        keyDirection = Direction.right;
+      } else if (event.logicalKey == LogicalKeyboardKey.keyW) {
+        keyDirection = Direction.up;
+      } else if (event.logicalKey == LogicalKeyboardKey.keyS) {
+        keyDirection = Direction.down;
+      }
+    } else {
+      // Yön tuşları kontrolleri
+      if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+        keyDirection = Direction.left;
+      } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+        keyDirection = Direction.right;
+      } else if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+        keyDirection = Direction.up;
+      } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+        keyDirection = Direction.down;
+      }
     }
+
     return keyDirection;
   }
 
   void playerMove(bool isKeyDown, Direction keyDirection) {
+    debugPrint(_player.position.toString());
+    if (_player.position.x == 128) {
+      // featureManager.applyFeature(Feature.sprint);
+      // add(skillComponent);
+      removeWhere((component) => component == skillComponent);
+    }
     if (isKeyDown && keyDirection != Direction.none) {
       _player.direction = keyDirection;
       _player.moveCount = oneBlockSize.toInt();
