@@ -170,7 +170,7 @@ class MainGame extends FlameGame with KeyboardEvents, HasGameRef {
     final component = skillComponent = SpriteComponent(
       size: Vector2.all(oneBlockSize),
       sprite: skill,
-      position: Vector2(oneBlockSize * 1, oneBlockSize * 2),
+      position: Vector2(oneBlockSize * 1, oneBlockSize * 3),
     );
     skillAvailable = true;
     add(component);
